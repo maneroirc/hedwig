@@ -14,7 +14,7 @@ defmodule Hedwig.Adapters.Console.Reader do
 
   def handle_cast(:get_io, {owner, user}) do
     me = self()
-    Task.start fn -> send(me, get_io(user)) end
+    Task.start(fn -> send(me, get_io(user)) end)
     {:noreply, {owner, user}}
   end
 

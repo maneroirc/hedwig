@@ -15,8 +15,10 @@ defmodule Hedwig.TestRobot do
 
   def handle_disconnect(:error, state),
     do: {:disconnect, :normal, state}
+
   def handle_disconnect(:reconnect, state),
     do: {:reconnect, state}
+
   def handle_disconnect({:reconnect, timer}, state),
     do: {:reconnect, timer, state}
 

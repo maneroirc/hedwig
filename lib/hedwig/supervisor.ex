@@ -7,11 +7,12 @@ defmodule Hedwig.Supervisor do
     Supervisor.start_link(__MODULE__, :ok, name: Hedwig.Supervisor)
   end
 
+  @impl true
   def init(:ok) do
     children = [
-      supervisor(Hedwig.Robot.Supervisor, [[name: Hedwig.Robot.Supervisor]]),
+      {Hedwig.Robot.Supervisor, [name: Hedwig.Robot.Supervisor]}
     ]
 
-    supervise(children, strategy: :one_for_one)
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end

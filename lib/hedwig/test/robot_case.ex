@@ -24,7 +24,7 @@ defmodule Hedwig.RobotCase do
       {:ok, pid} = Hedwig.start_robot(robot, config)
       adapter = update_robot_adapter(pid)
 
-      on_exit fn -> Hedwig.stop_robot(pid) end
+      on_exit(fn -> Hedwig.stop_robot(pid) end)
 
       msg = %Hedwig.Message{robot: pid, text: "", user: "testuser"}
 

@@ -36,11 +36,13 @@ defmodule Hedwig.Adapter do
       def stop(pid, timeout \\ 5000) do
         ref = Process.monitor(pid)
         Process.exit(pid, :normal)
+
         receive do
           {:DOWN, ^ref, _, _, _} -> :ok
         after
           timeout -> exit(:timeout)
         end
+
         :ok
       end
 
@@ -49,7 +51,7 @@ defmodule Hedwig.Adapter do
         :ok
       end
 
-      defoverridable [__before_compile__: 1, send: 2, reply: 2, emote: 2]
+      defoverridable __before_compile__: 1, send: 2, reply: 2, emote: 2
     end
   end
 
@@ -60,8 +62,8 @@ defmodule Hedwig.Adapter do
 
   @type robot :: pid
   @type state :: term
-  @type opts  :: any
-  @type msg   :: Hedwig.Message.t
+  @type opts :: any
+  @type msg :: Hedwig.Message.t()
 
   @callback send(pid, msg) :: term
   @callback reply(pid, msg) :: term

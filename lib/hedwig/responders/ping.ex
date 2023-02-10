@@ -9,6 +9,6 @@ defmodule Hedwig.Responders.Ping do
   hedwig: ping - Responds with 'pong'
   """
   respond ~r/ping$/i, msg do
-    reply msg, "pong"
+    reply(msg, "pong")
   end
 end

@@ -4,33 +4,40 @@ defmodule Hedwig.Mixfile do
   @version "1.0.1"
 
   def project do
-    [app: :hedwig,
-     version: @version,
-     elixir: "~> 1.2",
-     docs: docs(),
-     deps: deps(),
-     package: package(),
-     name: "Hedwig",
-     elixirc_paths: elixirc_paths(Mix.env),
-     description: "An adapter-based chat bot framework",
-     source_url: "https://github.com/hedwig-im/hedwig",
-     homepage_url: "https://github.com/hedwig-im/hedwig",
-     test_coverage: [tool: ExCoveralls],
-     preferred_cli_env: [
-       "coveralls": :test,
-       "coveralls.html": :test,
-       "coveralls.detail": :test,
-       "coveralls.post": :test]]
+    [
+      app: :hedwig,
+      version: @version,
+      elixir: "~> 1.13",
+      docs: docs(),
+      deps: deps(),
+      package: package(),
+      name: "Hedwig",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      description: "An adapter-based chat bot framework",
+      source_url: "https://github.com/ircdev/hedwig",
+      homepage_url: "https://github.com/ircdev/hedwig",
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.html": :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test
+      ]
+    ]
   end
 
   def application do
-    [applications: [:logger],
-     mod: {Hedwig, []}]
+    [
+      mod: {Hedwig, []},
+      extra_applications: [
+        :logger,
+        :eex
+      ]
+    ]
   end
 
   defp docs do
-    [extras: docs_extras(),
-     main: "readme"]
+    [extras: docs_extras(), main: "readme"]
   end
 
   defp docs_extras do
@@ -38,9 +45,10 @@ defmodule Hedwig.Mixfile do
   end
 
   defp deps do
-    [{:excoveralls, "~> 0.7.2", only: :test},
-     {:ex_doc, "~> 0.16.3", only: :dev},
-     {:credo, "~> 0.8", only: [:dev, :test], runtime: false}
+    [
+      {:excoveralls, "~> 0.15.3", only: :test},
+      {:ex_doc, "~> 0.29.1", only: :dev},
+      {:credo, "~> 1.6.7", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -48,12 +56,14 @@ defmodule Hedwig.Mixfile do
   defp elixirc_paths(_), do: ["lib"]
 
   defp package do
-    [files: ["lib", "mix.exs", "README*", "LICENSE*"],
-     maintainers: ["Sonny Scroggin"],
-     licenses: ["MIT"],
-     links: %{
-       "GitHub" => "https://github.com/hedwig-im/hedwig",
-       "Docs" => "https://hexdocs.pm/hedwig"
-     }]
+    [
+      files: ["lib", "mix.exs", "README*", "LICENSE*"],
+      maintainers: ["Graham McIntire", "Sonny Scroggin"],
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => "https://github.com/ircdev/hedwig",
+        "Docs" => "https://hexdocs.pm/hedwig"
+      }
+    ]
   end
 end

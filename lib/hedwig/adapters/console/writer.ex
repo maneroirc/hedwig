@@ -42,7 +42,7 @@ defmodule Hedwig.Adapters.Console.Writer do
   end
 
   defp handle_result(msg, name) do
-    print prompt(name) ++ [:normal, :default_color, msg.text]
+    print(prompt(name) ++ [:normal, :default_color, msg.text])
   end
 
   defp prompt(name) do
@@ -50,16 +50,16 @@ defmodule Hedwig.Adapters.Console.Writer do
   end
 
   defp clear_screen do
-    print [:clear, :home]
+    print([:clear, :home])
   end
 
   defp display_banner do
-    print """
+    print("""
     Hedwig Console - press Ctrl+C to exit.
 
     The console adapter is useful for quickly verifying how your
     bot will respond based on the current installed responders
 
-    """
+    """)
   end
 end

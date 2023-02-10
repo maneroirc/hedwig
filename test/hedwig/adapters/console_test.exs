@@ -5,7 +5,7 @@ defmodule Hedwig.Adapters.ConsoleTest do
   alias Hedwig.Adapters.Console
 
   test "console handles messages from the connection" do
-    capture_io fn ->
+    capture_io(fn ->
       {:ok, adapter} = Hedwig.Adapter.start_link(Console, name: "hedwig", user: "testuser")
 
       handle_connect()
@@ -13,12 +13,12 @@ defmodule Hedwig.Adapters.ConsoleTest do
       msg = {:message, %{"text" => "ping", "user" => "testuser"}}
       send(adapter, msg)
       assert_receive {:"$gen_cast", {:handle_in, %Hedwig.Message{text: "ping", user: "testuser"}}}
-    end
+    end)
   end
 
   describe "sending messages to the connection process" do
     test "send/2" do
-      capture_io fn ->
+      capture_io(fn ->
         {:ok, adapter} = Hedwig.Adapter.start_link(Console, name: "hedwig", user: "testuser")
 
         handle_connect()
@@ -29,11 +29,11 @@ defmodule Hedwig.Adapters.ConsoleTest do
         Console.send(adapter, msg)
 
         assert_receive {:reply, ^msg}
-      end
+      end)
     end
 
     test "reply/2 includes the reply user's name" do
-      capture_io fn ->
+      capture_io(fn ->
         {:ok, adapter} = Hedwig.Adapter.start_link(Console, name: "hedwig", user: "testuser")
 
         handle_connect()
@@ -44,11 +44,11 @@ defmodule Hedwig.Adapters.ConsoleTest do
         Console.reply(adapter, msg)
 
         assert_receive {:reply, %Hedwig.Message{text: "testuser: pong"}}
-      end
+      end)
     end
 
     test "emote/2" do
-      capture_io fn ->
+      capture_io(fn ->
         {:ok, adapter} = Hedwig.Adapter.start_link(Console, name: "hedwig", user: "testuser")
 
         handle_connect()
@@ -59,7 +59,7 @@ defmodule Hedwig.Adapters.ConsoleTest do
         Console.emote(adapter, msg)
 
         assert_receive {:reply, ^msg}
-      end
+      end)
     end
   end
 

@@ -5,9 +5,11 @@ defmodule Hedwig.Responder.Supervisor do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(Hedwig.Responder, [], restart: :transient)
+      Hedwig.Responder,
+      [],
+      restart: :transient
     ]
 
-    Supervisor.start_link(children, strategy: :simple_one_for_one)
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end

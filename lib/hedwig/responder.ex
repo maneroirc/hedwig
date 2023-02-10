@@ -48,9 +48,9 @@ defmodule Hedwig.Responder do
       import unquote(__MODULE__)
       import Kernel, except: [send: 2]
 
-      Module.register_attribute __MODULE__, :hear, accumulate: true
-      Module.register_attribute __MODULE__, :respond, accumulate: true
-      Module.register_attribute __MODULE__, :usage, accumulate: true
+      Module.register_attribute(__MODULE__, :hear, accumulate: true)
+      Module.register_attribute(__MODULE__, :respond, accumulate: true)
+      Module.register_attribute(__MODULE__, :usage, accumulate: true)
 
       @before_compile unquote(__MODULE__)
     end
@@ -101,7 +101,7 @@ defmodule Hedwig.Responder do
       send msg, random(["apples", "bananas", "carrots"])
   """
   def random(list) do
-    :rand.seed(:exsplus, :os.timestamp)
+    :rand.seed(:exsplus, :os.timestamp())
     Enum.random(list)
   end
 
@@ -123,6 +123,7 @@ defmodule Hedwig.Responder do
   """
   defmacro hear(regex, msg, state \\ Macro.escape(%{}), do: block) do
     name = unique_name(:hear)
+
     quote do
       @hear {unquote(regex), unquote(name)}
       @doc false
@@ -146,6 +147,7 @@ defmodule Hedwig.Responder do
   """
   defmacro respond(regex, msg, state \\ Macro.escape(%{}), do: block) do
     name = unique_name(:respond)
+
     quote do
       @respond {unquote(regex), unquote(name)}
       @doc false
@@ -162,7 +164,7 @@ defmodule Hedwig.Responder do
   @doc false
   def respond_pattern(pattern, name, aka) do
     pattern
-    |> Regex.source
+    |> Regex.source()
     |> rewrite_source(name, aka)
     |> Regex.compile!(Regex.opts(pattern))
   end
@@ -170,6 +172,7 @@ defmodule Hedwig.Responder do
   defp rewrite_source(source, name, nil) do
     "^\\s*[@]?#{name}[:,]?\\s*(?:#{source})"
   end
+
   defp rewrite_source(source, name, aka) do
     [a, b] = if String.length(name) > String.length(aka), do: [name, aka], else: [aka, name]
     "^\\s*[@]?(?:#{a}[:,]?|#{b}[:,]?)\\s*(?:#{source})"
@@ -186,12 +189,14 @@ defmodule Hedwig.Responder do
       def init({aka, name, opts, robot}) do
         :ok = GenServer.cast(self(), :compile_responders)
 
-        {:ok, %{
-          aka: aka,
-          name: name,
-          opts: opts,
-          responders: [],
-          robot: robot}}
+        {:ok,
+         %{
+           aka: aka,
+           name: name,
+           opts: opts,
+           responders: [],
+           robot: robot
+         }}
       end
 
       def handle_cast(:compile_responders, %{aka: aka, name: name} = state) do
@@ -203,14 +208,15 @@ defmodule Hedwig.Responder do
       end
 
       defp dispatch_responders(msg, %{responders: responders} = state) do
-        Enum.reduce responders, state, fn responder, new_state ->
+        Enum.reduce(responders, state, fn responder, new_state ->
           case dispatch_responder(responder, msg, new_state) do
             :ok ->
               new_state
+
             {:ok, new_state} ->
               new_state
           end
-        end
+        end)
       end
 
       defp dispatch_responder({regex, fun}, %{text: text} = msg, state) do
@@ -224,21 +230,24 @@ defmodule Hedwig.Responder do
 
       defp find_matches(regex, text) do
         case Regex.names(regex) do
-          []  ->
+          [] ->
             matches = Regex.run(regex, text)
+
             Enum.reduce(Enum.with_index(matches), %{}, fn {match, index}, acc ->
               Map.put(acc, index, match)
             end)
+
           _ ->
             Regex.named_captures(regex, text)
         end
       end
 
       defp compile_responders(name, aka) do
-        responders = for {regex, fun} <- @respond do
-          regex = Hedwig.Responder.respond_pattern(regex, name, aka)
-          {regex, fun}
-        end
+        responders =
+          for {regex, fun} <- @respond do
+            regex = Hedwig.Responder.respond_pattern(regex, name, aka)
+            {regex, fun}
+          end
 
         List.flatten([@hear, responders])
       end

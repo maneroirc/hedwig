@@ -31,35 +31,36 @@ defmodule Hedwig.Responders.Help do
   hedwig help - Displays all of the help commands that hedwig knows about.
   """
   respond ~r/help$/, msg, state do
-    send msg, display_usage(state)
+    send(msg, display_usage(state))
   end
 
   @usage """
   hedwig help <query> - Displays all help commands that match <query>.
   """
   respond ~r/help (?<query>.*)/, msg, state do
-    send msg, search(state, msg.matches["query"])
+    send(msg, search(state, msg.matches["query"]))
   end
 
   defp display_usage(state) do
     state
     |> all_usage()
     |> Enum.reverse()
-    |> Enum.map_join("\n", &(&1))
+    |> Enum.map_join("\n", & &1)
   end
 
   defp search(state, query) do
     state
     |> all_usage()
     |> Enum.reverse()
-    |> Enum.filter(&(String.match?(&1, ~r/(#{query})/i)))
-    |> Enum.map_join("\n", &(&1))
+    |> Enum.filter(&String.match?(&1, ~r/(#{query})/i))
+    |> Enum.map_join("\n", & &1)
   end
 
   defp all_usage(%{name: name, robot: robot}) do
     responders = Hedwig.Robot.responders(robot)
-    Enum.reduce responders, [], fn {mod, _opts}, acc ->
+
+    Enum.reduce(responders, [], fn {mod, _opts}, acc ->
       mod.usage(name) ++ acc
-    end
+    end)
   end
 end

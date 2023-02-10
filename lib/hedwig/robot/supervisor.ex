@@ -15,24 +15,26 @@ defmodule Hedwig.Robot.Supervisor do
       |> Keyword.merge(opts)
     else
       raise ArgumentError,
-        "configuration for #{inspect robot} not specified in #{inspect otp_app} environment"
+            "configuration for #{inspect(robot)} not specified in #{inspect(otp_app)} environment"
     end
   end
 
   def parse_config(robot, opts) do
     otp_app = Keyword.fetch!(opts, :otp_app)
-    robot_config  = Application.get_env(otp_app, robot, [])
+    robot_config = Application.get_env(otp_app, robot, [])
     adapter = opts[:adapter] || robot_config[:adapter]
 
     unless adapter do
-      raise ArgumentError, "missing `:adapter` configuration for " <>
-                           "#{inspect otp_app}, #{inspect robot}"
+      raise ArgumentError,
+            "missing `:adapter` configuration for " <>
+              "#{inspect(otp_app)}, #{inspect(robot)}"
     end
 
     unless Code.ensure_loaded?(adapter) do
-      raise ArgumentError, "adapter #{inspect adapter} was not compiled, " <>
-                           "ensure it is correct and it is included as a " <>
-                           "project dependency."
+      raise ArgumentError,
+            "adapter #{inspect(adapter)} was not compiled, " <>
+              "ensure it is correct and it is included as a " <>
+              "project dependency."
     end
 
     {otp_app, adapter, robot_config}
@@ -40,9 +42,11 @@ defmodule Hedwig.Robot.Supervisor do
 
   def init(_) do
     children = [
-      worker(Hedwig.Robot, [], restart: :transient)
+      Hedwig.Robot,
+      [],
+      restart: :transient
     ]
 
-    supervise(children, strategy: :simple_one_for_one)
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end
