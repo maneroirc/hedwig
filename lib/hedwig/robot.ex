@@ -209,7 +209,7 @@ defmodule Hedwig.Robot do
       end
 
       defp log_incorrect_return(atom) do
-        Logger.warn("""
+        Logger.warning("""
         #{inspect(atom)} return value from `handle_in/2` only works with `%Hedwig.Message{}` structs.
         """)
       end
