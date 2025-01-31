@@ -2,6 +2,7 @@ defmodule Hedwig.Adapters.Console.WriterTest do
   use ExUnit.Case
 
   import ExUnit.CaptureIO
+
   alias Hedwig.Adapters.Console.Writer
 
   test "console connection prints a banner" do

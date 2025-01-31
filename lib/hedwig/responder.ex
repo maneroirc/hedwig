@@ -45,8 +45,8 @@ defmodule Hedwig.Responder do
 
   defmacro __using__(_opts) do
     quote location: :keep do
-      import unquote(__MODULE__)
       import Kernel, except: [send: 2]
+      import unquote(__MODULE__)
 
       Module.register_attribute(__MODULE__, :hear, accumulate: true)
       Module.register_attribute(__MODULE__, :respond, accumulate: true)
@@ -183,7 +183,8 @@ defmodule Hedwig.Responder do
       @doc false
       def usage(name) do
         import String
-        Enum.map(@usage, &(&1 |> trim |> replace("hedwig", name)))
+
+        Enum.map(@usage, &(&1 |> trim() |> replace("hedwig", name)))
       end
 
       def init({aka, name, opts, robot}) do

@@ -47,7 +47,7 @@ defmodule Hedwig.Mixfile do
   defp deps do
     [
       {:ex_doc, "~> 0.32", only: :dev},
-      {:credo, "~> 1.7.7", only: [:dev, :test], runtime: false}
+      {:styler, "~> 1.1", only: [:dev, :test], runtime: false}
     ]
   end
 

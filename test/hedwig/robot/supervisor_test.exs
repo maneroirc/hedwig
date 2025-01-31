@@ -1,6 +1,8 @@
 defmodule Hedwig.Robot.SupervisorTest do
   use ExUnit.Case
 
+  alias Hedwig.Adapters.Console
+
   test "missing otp config" do
     assert_raise ArgumentError, fn ->
       Hedwig.Robot.Supervisor.config(NoSuchApp.Robot, :no_such_app, [])
@@ -8,9 +10,9 @@ defmodule Hedwig.Robot.SupervisorTest do
   end
 
   test "parse config (ok)" do
-    opts = [otp_app: :alfred, adapter: Hedwig.Adapters.Console]
+    opts = [otp_app: :alfred, adapter: Console]
     result = Hedwig.Robot.Supervisor.parse_config(Alfred.Robot, opts)
-    assert result == {:alfred, Hedwig.Adapters.Console, []}
+    assert result == {:alfred, Console, []}
   end
 
   test "parse config (missing adapter keyword)" do

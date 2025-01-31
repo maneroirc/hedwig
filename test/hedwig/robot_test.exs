@@ -20,6 +20,7 @@ defmodule Hedwig.RobotTest do
   @tag start_robot: true
   test "handle_disconnect/1", %{robot: robot} do
     import Hedwig.Robot
+
     assert :reconnect == handle_disconnect(robot, :reconnect)
     assert {:reconnect, 5000} == handle_disconnect(robot, {:reconnect, 5000})
     assert {:disconnect, :normal} == handle_disconnect(robot, :error)

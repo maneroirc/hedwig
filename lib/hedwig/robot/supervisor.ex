@@ -24,13 +24,13 @@ defmodule Hedwig.Robot.Supervisor do
     robot_config = Application.get_env(otp_app, robot, [])
     adapter = opts[:adapter] || robot_config[:adapter]
 
-    unless adapter do
+    if !adapter do
       raise ArgumentError,
             "missing `:adapter` configuration for " <>
               "#{inspect(otp_app)}, #{inspect(robot)}"
     end
 
-    unless Code.ensure_loaded?(adapter) do
+    if !Code.ensure_loaded?(adapter) do
       raise ArgumentError,
             "adapter #{inspect(adapter)} was not compiled, " <>
               "ensure it is correct and it is included as a " <>

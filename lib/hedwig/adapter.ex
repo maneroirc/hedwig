@@ -10,10 +10,11 @@ defmodule Hedwig.Adapter do
   @doc false
   defmacro __using__(_opts) do
     quote do
-      import Kernel, except: [send: 2]
-
       @behaviour Hedwig.Adapter
+
       use GenServer
+
+      import Kernel, except: [send: 2]
 
       def send(pid, %Hedwig.Message{} = msg) do
         GenServer.cast(pid, {:send, msg})

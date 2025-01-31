@@ -2,6 +2,7 @@ defmodule Hedwig.Adapters.ConsoleTest do
   use ExUnit.Case
 
   import ExUnit.CaptureIO
+
   alias Hedwig.Adapters.Console
 
   test "console handles messages from the connection" do

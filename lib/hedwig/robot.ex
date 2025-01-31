@@ -44,6 +44,7 @@ defmodule Hedwig.Robot do
   defmacro __using__(opts) do
     quote location: :keep, bind_quoted: [opts: opts] do
       use GenServer
+
       require Logger
 
       {otp_app, adapter, robot_config} = Hedwig.Robot.Supervisor.parse_config(__MODULE__, opts)
@@ -83,7 +84,7 @@ defmodule Hedwig.Robot do
         name = Keyword.get(opts, :name)
         {responders, opts} = Keyword.pop(opts, :responders, [])
 
-        unless responders == [] do
+        if responders != [] do
           GenServer.cast(self(), {:install_responders, responders})
         end
 

@@ -13,6 +13,7 @@ defmodule Hedwig.Adapters.Console do
   interface to your bot.
   """
   use Hedwig.Adapter
+
   alias Hedwig.Adapters.Console.Connection
 
   @doc false

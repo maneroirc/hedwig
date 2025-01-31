@@ -1,4 +1,5 @@
 defmodule Hedwig.FileHelpers do
+  @moduledoc false
   import ExUnit.Assertions
 
   @doc """

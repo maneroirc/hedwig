@@ -2,7 +2,9 @@ defmodule Hedwig.Adapters.Console.Connection do
   @moduledoc false
   use GenServer
 
-  alias Hedwig.Adapters.Console.{Connection, Reader, Writer}
+  alias Hedwig.Adapters.Console.Connection
+  alias Hedwig.Adapters.Console.Reader
+  alias Hedwig.Adapters.Console.Writer
 
   defstruct name: nil, owner: nil, reader: nil, user: nil, writer: nil
 

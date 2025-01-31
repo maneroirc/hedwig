@@ -1,8 +1,4 @@
 defmodule Mix.Tasks.Hedwig.Gen.Robot do
-  use Mix.Task
-
-  import Mix.Generator
-
   @shortdoc "Generate a new robot"
 
   @moduledoc """
@@ -22,6 +18,10 @@ defmodule Mix.Tasks.Hedwig.Gen.Robot do
     * `--robot` - the robot to generate (defaults to `YourApp.Robot`)
 
   """
+  use Mix.Task
+
+  import Mix.Generator
+
   @switches [aka: :string, name: :string, robot: :string]
 
   @doc false
@@ -86,20 +86,20 @@ defmodule Mix.Tasks.Hedwig.Gen.Robot do
 
   defp default_robot(app) do
     app
-    |> alias_module
+    |> alias_module()
     |> Module.concat(Robot)
   end
 
   defp alias_module(app) do
     case Application.get_env(app, :app_namespace, app) do
-      ^app -> app |> to_string |> Macro.camelize()
-      mod -> mod |> inspect
+      ^app -> app |> to_string() |> Macro.camelize()
+      mod -> inspect(mod)
     end
   end
 
   defp available_adapters(deps) do
     deps
-    |> all_modules
+    |> all_modules()
     |> Kernel.++(hedwig_modules())
     |> Enum.uniq()
     |> Enum.filter(&implements_adapter?/1)
@@ -148,7 +148,7 @@ defmodule Mix.Tasks.Hedwig.Gen.Robot do
 
   defp get_adapter_module(deps) do
     adapters = available_adapters(deps)
-    {selection, _} = adapters |> prompt_for_adapter |> Integer.parse()
+    {selection, _} = adapters |> prompt_for_adapter() |> Integer.parse()
     adapters[selection]
   end
 

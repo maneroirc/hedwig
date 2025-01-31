@@ -1,4 +1,5 @@
 defmodule TestResponder do
+  @moduledoc false
   use Hedwig.Responder
 
   @usage """

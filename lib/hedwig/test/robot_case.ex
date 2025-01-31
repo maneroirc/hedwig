@@ -1,13 +1,14 @@
 defmodule Hedwig.RobotCase do
+  @moduledoc false
   use ExUnit.CaseTemplate
 
-  @moduledoc false
   @robot Hedwig.TestRobot
   @default_responders [{Hedwig.Responders.Help, []}, {TestResponder, []}]
 
   using do
     quote do
       import unquote(__MODULE__)
+
       @robot Hedwig.TestRobot
     end
   end
