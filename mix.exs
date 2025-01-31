@@ -46,7 +46,6 @@ defmodule Hedwig.Mixfile do
 
   defp deps do
     [
-      {:excoveralls, "~> 0.18", only: :test},
       {:ex_doc, "~> 0.32", only: :dev},
       {:credo, "~> 1.7.7", only: [:dev, :test], runtime: false}
     ]
