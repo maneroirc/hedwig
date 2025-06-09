@@ -146,9 +146,6 @@ defmodule Hedwig.Robot do
         case handle_connect(state) do
           {:ok, state} ->
             {:reply, :ok, state}
-
-          {:stop, reason, state} ->
-            {:stop, reason, state}
         end
       end
 
@@ -189,14 +186,6 @@ defmodule Hedwig.Robot do
 
           {:dispatch, _msg, state} ->
             log_incorrect_return(:dispatch)
-            {:noreply, state}
-
-          {fun, {%Hedwig.Message{} = msg, text}, state} when fun in [:send, :reply, :emote] ->
-            apply(Hedwig.Responder, fun, [msg, text])
-            {:noreply, state}
-
-          {fun, {_msg, _text}, state} when fun in [:send, :reply, :emote] ->
-            log_incorrect_return(fun)
             {:noreply, state}
 
           {:noreply, state} ->
