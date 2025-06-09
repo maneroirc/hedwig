@@ -1,78 +1,55 @@
 defmodule Hedwig.Adapters.ConsoleTest do
   use ExUnit.Case
 
-  import ExUnit.CaptureIO
-
   alias Hedwig.Adapters.Console
 
-  test "console handles messages from the connection" do
-    capture_io(fn ->
-      {:ok, adapter} = Hedwig.Adapter.start_link(Console, name: "hedwig", user: "testuser")
-
-      handle_connect()
-      # Simulate an incoming message from the connection process
-      msg = {:message, %{"text" => "ping", "user" => "testuser"}}
-      send(adapter, msg)
-      assert_receive {:"$gen_cast", {:handle_in, %Hedwig.Message{text: "ping", user: "testuser"}}}
-    end)
+  test "init/1" do
+    opts = %{name: "hedwig"}
+    {:ok, state} = Console.init(opts)
+    assert state.writer == nil
+    assert state.opts == opts
   end
 
-  describe "sending messages to the connection process" do
-    test "send/2" do
-      capture_io(fn ->
-        {:ok, adapter} = Hedwig.Adapter.start_link(Console, name: "hedwig", user: "testuser")
-
-        handle_connect()
-        # replace the adapter's connection pid to the test process
-        replace_connection_pid(adapter)
-
-        msg = %Hedwig.Message{text: "pong", user: "testuser"}
-        Console.send(adapter, msg)
-
-        assert_receive {:reply, ^msg}
-      end)
-    end
-
-    test "reply/2 includes the reply user's name" do
-      capture_io(fn ->
-        {:ok, adapter} = Hedwig.Adapter.start_link(Console, name: "hedwig", user: "testuser")
-
-        handle_connect()
-        # replace the adapter's connection pid to the test process
-        replace_connection_pid(adapter)
-
-        msg = %Hedwig.Message{text: "pong", user: "testuser"}
-        Console.reply(adapter, msg)
-
-        assert_receive {:reply, %Hedwig.Message{text: "testuser: pong"}}
-      end)
-    end
-
-    test "emote/2" do
-      capture_io(fn ->
-        {:ok, adapter} = Hedwig.Adapter.start_link(Console, name: "hedwig", user: "testuser")
-
-        handle_connect()
-        # replace the adapter's connection pid to the test process
-        replace_connection_pid(adapter)
-
-        msg = %Hedwig.Message{text: "pong", user: "testuser"}
-        Console.emote(adapter, msg)
-
-        assert_receive {:reply, ^msg}
-      end)
-    end
+  test "handle_connect/1" do
+    opts = %{name: "hedwig"}
+    {:ok, state} = Console.init(opts)
+    {:ok, new_state} = Console.handle_connect(state)
+    assert new_state.writer != nil
   end
 
-  defp handle_connect do
-    receive do
-      {:"$gen_call", from, :handle_connect} ->
-        GenServer.reply(from, :ok)
-    end
+  test "handle_disconnect/2" do
+    opts = %{name: "hedwig"}
+    {:ok, state} = Console.init(opts)
+    {:ok, new_state} = Console.handle_connect(state)
+    {:ok, final_state} = Console.handle_disconnect(:normal, new_state)
+    assert final_state == new_state
   end
 
-  defp replace_connection_pid(adapter) do
-    test_process = self()
-    :sys.replace_state(adapter, fn state -> %{state | conn: test_process} end)
+  test "handle_in/2" do
+    opts = %{name: "hedwig"}
+    {:ok, state} = Console.init(opts)
+    {:ok, new_state} = Console.handle_connect(state)
+    msg = %Hedwig.Message{text: "hello"}
+    {:reply, reply_msg, final_state} = Console.handle_in(msg, new_state)
+    assert reply_msg.text == "hello"
+    assert final_state == new_state
+  end
+
+  test "handle_out/2" do
+    opts = %{name: "hedwig"}
+    {:ok, state} = Console.init(opts)
+    {:ok, new_state} = Console.handle_connect(state)
+    msg = %Hedwig.Message{text: "hello"}
+    {:ok, final_state} = Console.handle_out(msg, new_state)
+    assert final_state == new_state
+  end
+
+  test "emote/2" do
+    opts = %{name: "hedwig"}
+    {:ok, state} = Console.init(opts)
+    {:ok, new_state} = Console.handle_connect(state)
+    msg = %Hedwig.Message{text: "hello"}
+    {:ok, final_state} = Console.handle_out(msg, new_state)
+    assert final_state == new_state
   end
 end

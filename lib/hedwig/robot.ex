@@ -55,8 +55,19 @@ defmodule Hedwig.Robot do
       @log_level robot_config[:log_level] || :debug
       @otp_app otp_app
 
-      def start_link(opts \\ []) do
-        Hedwig.start_robot(__MODULE__, opts)
+      def child_spec(opts) do
+        %{
+          id: __MODULE__,
+          start: {__MODULE__, :start_link, [opts]},
+          type: :worker,
+          restart: :permanent,
+          shutdown: 5000
+        }
+      end
+
+      def start_link(opts \\ [])
+      def start_link(opts) do
+        GenServer.start_link(__MODULE__, {self(), opts})
       end
 
       def stop(robot) do
@@ -78,18 +89,22 @@ defmodule Hedwig.Robot do
 
       def __adapter__, do: @adapter
 
-      def init({robot, opts}) do
-        opts = robot.config(opts)
+      def init({_robot, opts}) do
+        Logger.info("Hedwig.Robot: Initializing with options: #{inspect(opts)}")
+        opts = config(opts)
         aka = Keyword.get(opts, :aka)
         name = Keyword.get(opts, :name)
         {responders, opts} = Keyword.pop(opts, :responders, [])
 
         if responders != [] do
+          Logger.info("Hedwig.Robot: Installing responders: #{inspect(responders)}")
           GenServer.cast(self(), {:install_responders, responders})
         end
 
-        {:ok, adapter} = @adapter.start_link(robot, opts)
+        {:ok, adapter} = @adapter.start_link(__MODULE__, opts)
+        Logger.info("Hedwig.Robot: Adapter started successfully: #{inspect(adapter)}")
         {:ok, responder_sup} = Hedwig.Responder.Supervisor.start_link()
+        Logger.info("Hedwig.Robot: Responder supervisor started successfully: #{inspect(responder_sup)}")
 
         {:ok,
          %Hedwig.Robot{
@@ -190,8 +205,15 @@ defmodule Hedwig.Robot do
 
       def handle_cast({:install_responders, responders}, %{aka: aka, name: name} = state) do
         for {module, opts} <- responders do
-          args = [module, {aka, name, opts, self()}]
-          Supervisor.start_child(state.responder_sup, args)
+          child_spec = %{
+            id: module,
+            start: {module, :start_link, [{aka, name, opts, self()}]},
+            type: :worker,
+            restart: :transient,
+            shutdown: 500
+          }
+
+          DynamicSupervisor.start_child(state.responder_sup, child_spec)
         end
 
         {:noreply, state}

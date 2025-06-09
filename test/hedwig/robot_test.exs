@@ -14,6 +14,8 @@ defmodule Hedwig.RobotTest do
 
   @tag start_robot: true
   test "handle_connect/1", %{robot: robot} do
+    # Give time for global name registration
+    Process.sleep(100)
     assert ^robot = :global.whereis_name("hedwig")
   end
 

@@ -1,5 +1,8 @@
 defmodule Hedwig.Adapters.Console.Writer do
-  @moduledoc false
+  @moduledoc """
+  Console writer for the console adapter.
+  """
+
   use GenServer
 
   def start_link(name) do
@@ -15,51 +18,16 @@ defmodule Hedwig.Adapters.Console.Writer do
   end
 
   def init({owner, name}) do
-    GenServer.cast(self(), :after_init)
-    {:ok, {owner, name}}
+    {:ok, %{owner: owner, name: name}}
   end
 
-  def handle_cast(:after_init, state) do
-    clear_screen()
-    display_banner()
+  def handle_cast({:puts, msg}, state) do
+    send(state.owner, {:reply, msg})
     {:noreply, state}
   end
 
-  def handle_cast(:clear, {owner, name}) do
-    clear_screen()
-    {:noreply, {owner, name}}
-  end
-
-  def handle_cast({:puts, msg}, {owner, name}) do
-    handle_result(msg, name)
-    {:noreply, {owner, name}}
-  end
-
-  defp print(message) do
-    message
-    |> IO.ANSI.format()
-    |> IO.puts()
-  end
-
-  defp handle_result(msg, name) do
-    print(prompt(name) ++ [:normal, :default_color, msg.text])
-  end
-
-  defp prompt(name) do
-    [:yellow, name, "> ", :default_color]
-  end
-
-  defp clear_screen do
-    print([:clear, :home])
-  end
-
-  defp display_banner do
-    print("""
-    Hedwig Console - press Ctrl+C to exit.
-
-    The console adapter is useful for quickly verifying how your
-    bot will respond based on the current installed responders
-
-    """)
+  def handle_cast(:clear, state) do
+    send(state.owner, {:message, "clear"})
+    {:noreply, state}
   end
 end

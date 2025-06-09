@@ -26,8 +26,9 @@ defmodule Hedwig do
       id: robot,
       start: {robot, :start_link, [opts]},
       type: :worker,
-      restart: :permanent,
-      shutdown: 5000
+      restart: if(Mix.env() == :test, do: :temporary, else: :permanent),
+      shutdown: 5000,
+      modules: [Hedwig.Robot]
     }
 
     DynamicSupervisor.start_child(Hedwig.Robot.Supervisor, child_spec)
