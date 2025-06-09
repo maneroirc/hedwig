@@ -22,20 +22,20 @@ defmodule Hedwig do
   Starts a robot with the given configuration.
   """
   def start_robot(robot, opts \\ []) do
-    Supervisor.start_child(Hedwig.Robot.Supervisor, [robot, opts])
+    DynamicSupervisor.start_child(Hedwig.Robot.Supervisor, {robot, opts})
   end
 
   @doc """
   Stops a robot with the given PID.
   """
   def stop_robot(pid) do
-    Supervisor.terminate_child(Hedwig.Robot.Supervisor, pid)
+    DynamicSupervisor.terminate_child(Hedwig.Robot.Supervisor, pid)
   end
 
   @doc """
   List all robots.
   """
   def which_robots do
-    Supervisor.which_children(Hedwig.Robot.Supervisor)
+    DynamicSupervisor.which_children(Hedwig.Robot.Supervisor)
   end
 end

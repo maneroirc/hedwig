@@ -1,10 +1,10 @@
 defmodule Hedwig.Robot.Supervisor do
   @moduledoc false
 
-  use Supervisor
+  use DynamicSupervisor
 
   def start_link(opts \\ []) do
-    Supervisor.start_link(__MODULE__, [], opts)
+    DynamicSupervisor.start_link(__MODULE__, [], opts)
   end
 
   def config(robot, otp_app, opts) do
@@ -40,13 +40,8 @@ defmodule Hedwig.Robot.Supervisor do
     {otp_app, adapter, robot_config}
   end
 
+  @impl true
   def init(_) do
-    children = [
-      Hedwig.Robot,
-      [],
-      restart: :transient
-    ]
-
-    Supervisor.init(children, strategy: :one_for_one)
+    DynamicSupervisor.init(strategy: :one_for_one)
   end
 end
