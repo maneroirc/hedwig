@@ -22,7 +22,15 @@ defmodule Hedwig do
   Starts a robot with the given configuration.
   """
   def start_robot(robot, opts \\ []) do
-    DynamicSupervisor.start_child(Hedwig.Robot.Supervisor, {robot, opts})
+    child_spec = %{
+      id: robot,
+      start: {robot, :start_link, [opts]},
+      type: :worker,
+      restart: :permanent,
+      shutdown: 5000
+    }
+
+    DynamicSupervisor.start_child(Hedwig.Robot.Supervisor, child_spec)
   end
 
   @doc """
