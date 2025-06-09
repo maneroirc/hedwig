@@ -14,14 +14,16 @@ defmodule Hedwig.TestRobot do
       :ok -> Logger.info("Hedwig.TestRobot: Unregistered name #{name} successfully")
       _ -> Logger.warning("Hedwig.TestRobot: Name #{name} was not registered")
     end
+
     # Then register our name
     case :global.register_name(name, self()) do
       :yes -> Logger.info("Hedwig.TestRobot: Registered name #{name} successfully")
       _ -> Logger.error("Hedwig.TestRobot: Failed to register name #{name}")
     end
-    
+
     # Manually install responders since the cast mechanism isn't working
     Logger.info("Hedwig.TestRobot: Manually installing responders: #{inspect(responders)}")
+
     for {module, opts} <- responders do
       child_spec = %{
         id: module,
@@ -36,10 +38,10 @@ defmodule Hedwig.TestRobot do
         {:error, reason} -> Logger.error("Hedwig.TestRobot: Failed to start responder #{module}: #{inspect(reason)}")
       end
     end
-    
+
     responder_children = Supervisor.which_children(sup)
     Logger.info("Hedwig.TestRobot: Responders after manual installation: #{inspect(responder_children)}")
-    
+
     {:ok, state}
   end
 
@@ -48,8 +50,6 @@ defmodule Hedwig.TestRobot do
   def handle_disconnect(:reconnect, state), do: {:reconnect, state}
 
   def handle_disconnect({:reconnect, timer}, state), do: {:reconnect, timer, state}
-
-
 
   def handle_in(%Hedwig.Message{} = msg, %{responder_sup: sup} = state) do
     Logger.info("Hedwig.TestRobot: Received message: #{inspect(msg)}")

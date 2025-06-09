@@ -1,9 +1,9 @@
 defmodule Hedwig.Adapters.Test do
   @moduledoc false
 
-  require Logger
-
   use Hedwig.Adapter
+
+  require Logger
 
   def init({owner, opts}) do
     robot = opts[:robot] || Hedwig.TestRobot
@@ -15,10 +15,12 @@ defmodule Hedwig.Adapters.Test do
 
   def handle_cast(:after_init, %{robot: robot, robot_pid: robot_pid} = state) do
     Logger.info("Handling :after_init for robot: #{inspect(robot)}")
+
     case Hedwig.Robot.handle_connect(robot_pid) do
       :ok -> Logger.debug("Robot connected successfully: #{inspect(robot)}")
       {:error, reason} -> Logger.error("Failed to connect robot: #{inspect(robot)}, reason: #{inspect(reason)}")
     end
+
     {:noreply, state}
   end
 

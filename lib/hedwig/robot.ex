@@ -66,6 +66,7 @@ defmodule Hedwig.Robot do
       end
 
       def start_link(opts \\ [])
+
       def start_link(opts) do
         GenServer.start_link(__MODULE__, {self(), opts})
       end
